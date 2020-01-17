@@ -22,4 +22,4 @@ The clauses and mapping can be exported to a file through `write(top,net_map,cla
 The functions have been verified through simulation. The simulation exercises every possible input value to a circuit and checks that the DIMACS encoding is consistent.
 The test requires cadical and Cadence xrun to be in `$PATH`
 
-The test is run with `python verilogTseytin.py c17.v`
+The test is run with `python verilog2dimacs.py c17.v`

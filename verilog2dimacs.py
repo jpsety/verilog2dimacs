@@ -2,17 +2,16 @@ import re
 
 def verilog2dimacs(path):
 
-	regex = "(or|nor|and|nand|not|xor|xnor) \S+\s*\((.+?)\);"
+	regex = "(or|nor|and|nand|not|xor|xnor)\s+\S+\s*\((.+?)\);"
 	top = path.split('/')[-1].replace('.v','')
 
 	with open(path, 'r') as f:
 		data = f.read()
-	print(data)
 
 	net_map = {}
 	clauses = []
 
-	for gate, net_str in re.findall(regex,data):
+	for gate, net_str in re.findall(regex,data,re.DOTALL):
 
 		# parse all nets
 		nets = net_str.replace(" ","").replace("\n","").replace("\t","").split(",")
@@ -112,6 +111,11 @@ def verilog2dimacs(path):
 			clauses.append(f'{net_map[out]} {net_map[new_net]} 0')
 			clauses.append(f'-{net_map[out]} -{net_map[new_net]} 0')
 
+	# constrain 1'b1 and 1'b0 nets
+	if '1\'b0' in net_map:
+		clauses.append(f"-{net_map['1\'b0']} 0")
+	if '1\'b1' in net_map:
+		clauses.append(f"{net_map['1\'b1']} 0")
 
 	return top,net_map,clauses
 
