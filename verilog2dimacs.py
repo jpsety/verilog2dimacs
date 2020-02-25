@@ -110,6 +110,18 @@ def verilog2dimacs(path):
 			clauses.append(f'{net_map[new_net]} {net_map[nets[-1]]} -{net_map[nets[-2]]} 0')
 			clauses.append(f'{net_map[out]} {net_map[new_net]} 0')
 			clauses.append(f'-{net_map[out]} -{net_map[new_net]} 0')
+	# handle assigns
+	assign_regex = "assign\s+(\S+)\s*=\s*(\S+);"
+	for n0, n1 in re.findall(assign_regex,data):
+
+		# ensure that the net is in the map
+		for net in (n0,n1):
+			if net not in net_map:
+				net_map[net] = len(net_map)+1
+
+		# tie nets together
+		clauses.append(f'-{net_map[n0]} {net_map[n1]} 0')
+		clauses.append(f'{net_map[n0]} -{net_map[n1]} 0')
 
 	# constrain 1'b1 and 1'b0 nets
 	if '1\'b0' in net_map:
